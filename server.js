@@ -14,12 +14,18 @@ app.use(express.json());
 
 app.use(cors()); // Разрешить все источники
 // Или с настройками:
-app.use(cors({
-    origin: 'http://localhost:3000', // Разрешить только этот источник
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Разрешённые методы
-    credentials: true // Если нужно передавать cookie
-}));
+const allowedOrigins = [
+    "http://localhost:3000", // Для локальной разработки
+    "https://clubtimer.vercel.app" // Для продакшена
+];
 
+app.use(
+    cors({
+        origin: allowedOrigins,
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true
+    })
+);
 // Логирование запросов (только в разработке)
 if (process.env.NODE_ENV !== "production") {
     app.use(morgan("dev"));
