@@ -54,5 +54,49 @@ router.get('/:buildingId/items', async (req, res) => {
     }
 });
 
+router.post('/create', async (req, res) => {
+    try {
+        console.log(req.body); // Посмотрим, что приходит
+        const {name, location, image} = req.body;
+
+        if (!name || !location || !image) {
+            return res.status(400).json({message: 'All fields are required'});
+        }
+
+        const building = new Building({name, location, image});
+        await building.save();
+
+        res.status(201).json({message: 'Successfully created', building});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({message: 'Server error'});
+    }
+});
+
+router.put('/update/:id', async (req, res) => {
+    try {
+        const {id} = req.params;
+        const {name, location, image} = req.body;
+
+        if (!name || !location || !image) {
+            return res.status(400).json({message: 'All fields are required'});
+        }
+
+        const updatedBuilding = await Building.findByIdAndUpdate(
+            id,
+            {name, location, image},
+            {new: true, runValidators: true} // Возвращает обновленный объект и проверяет валидацию
+        );
+
+        if (!updatedBuilding) {
+            return res.status(404).json({message: 'Building not found'});
+        }
+
+        res.status(200).json({message: 'Successfully updated', updatedBuilding});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({message: 'Server error'});
+    }
+});
 
 export default router;
